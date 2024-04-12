@@ -4,7 +4,7 @@ from vertexai.generative_models import GenerativeModel, Part, FinishReason
 import vertexai.preview.generative_models as generative_models
 import os
 
-from flask import Flask
+from flask import Flask,jsonify,request 
 
 app = Flask(__name__)
 
@@ -48,11 +48,17 @@ def generate():
 
 
 
-@app.route("/")
-def hello_world():
-    """Example Hello World route."""
-    name = os.environ.get("NAME", "World")
-    return generate()
+@app.route("/summary", methods = ['GET'])
+def summaryEndpoint():
+    
+    # summary = generate()
+    summary = 'go spurs!'
+
+    # generate a response with the summary in json format and cors-approved headers
+    response = jsonify({'summary': summary})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
 
 
 if __name__ == "__main__":
