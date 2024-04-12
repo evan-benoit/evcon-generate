@@ -8,6 +8,7 @@ from flask import Flask,jsonify,request
 import requests
 import hashlib
 import json
+from google.cloud import storage
 
 app = Flask(__name__)
 
@@ -80,8 +81,23 @@ def summaryEndpoint():
     dataHash = hashlib.sha256(json.dumps(teamData).encode()).hexdigest()
 
     fileName = countryCode + "-" + leagueID + "-" + season + "-" + dataHash + ".txt"
-
     print (fileName)
+
+    # Create a client to connect to the GCS bucket
+    client = storage.Client()
+
+    # Get the GCS bucket
+    bucket = client.get_bucket('evcon-summaries')
+
+    # Look for the file named fileName
+    blob = bucket.blob("test.txt")
+
+    # Download the file contents
+    file_contents = blob.download_as_text()
+
+    # Print the file contents
+    print(file_contents)
+
 
     # summary = generate()
     summary = 'go spurs!'
