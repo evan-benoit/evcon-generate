@@ -14,13 +14,16 @@ app = Flask(__name__)
 
 
 
-def generate():
+def generate(team, data):
 
-    text1 = """Give me a 1000 word summary of the english premier league season from the point of view of tottenham hotspur.  
+    prompt = """
+            Given this data, 
+            Give me a 1000 word summary of the english premier league season from the point of view of """ + team + """  
             Note that the season is still in progress.  
             Do not name any managers or players, but mention specific teams that they played.  
             Emphasize derbies.  
-            Summarize the start of the season, middle of the season, and then give the latest progress as of April 2024, summarizing their last four games"""
+            Summarize the start of the season, middle of the season, 
+            and then give the latest progress as of April 2024, summarizing their last four games """ + data
 
     generation_config = {
         "max_output_tokens": 8192,
@@ -38,7 +41,7 @@ def generate():
     vertexai.init(project="evcon-app", location="us-central1")
     model = GenerativeModel("gemini-1.5-pro-preview-0409")
     responses = model.generate_content(
-        [text1],
+        [prompt],
         generation_config=generation_config,
         safety_settings=safety_settings,
         stream=True,
@@ -90,17 +93,23 @@ def summaryEndpoint():
     bucket = client.get_bucket('evcon-summaries')
 
     # Look for the file named fileName
-    blob = bucket.blob("test.txt")
+    blob = bucket.blob(fileName)
 
-    # Download the file contents
-    file_contents = blob.download_as_text()
+    # If the file exists
+    if blob.exists():
+        print("file exists")
+        # Download the file contents
+        summary = blob.download_as_text()
 
-    # Print the file contents
-    print(file_contents)
+    else:
+        print("file doesn't exist, creating...")
 
+        # Generate the summary
+        summary = 'go spurs!'
 
-    # summary = generate()
-    summary = 'go spurs!'
+        # Upload the summary to the GCS bucket
+        blob.upload_from_string(summary)
+
 
     # generate a response with the summary in json format and cors-approved headers
     response = jsonify({'summary': summary})
