@@ -6,6 +6,8 @@ import os
 
 from flask import Flask,jsonify,request 
 import requests
+import hashlib
+import json
 
 app = Flask(__name__)
 
@@ -65,6 +67,10 @@ def summaryEndpoint():
     # get the response as a json object
     data = response.json()
     print (data)
+
+    # generate a checksum of the response
+    dataHash = hashlib.sha256(json.dumps(data).encode()).hexdigest()
+    print (dataHash)
 
     # summary = generate()
     summary = 'go spurs!'
