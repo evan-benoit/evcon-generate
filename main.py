@@ -18,7 +18,7 @@ def generate(team, data):
 
     prompt = """
             Given this data, 
-            Give me a 1000 word summary of the english premier league season from the point of view of """ + team + """  
+            Give me a 1000 word summary in markdown of the english premier league season from the point of view of """ + team + """  
             Note that the season is still in progress.  
             Do not name any managers or players, but mention specific teams that they played.  
             Emphasize derbies.  
@@ -108,7 +108,7 @@ def summaryEndpoint():
         summary = generate(team, json.dumps(teamData))
 
         print("done generating, now uploading")
-        
+
         # Upload the summary to the GCS bucket
         blob.upload_from_string(summary)
 
