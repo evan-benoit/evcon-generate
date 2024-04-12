@@ -14,16 +14,18 @@ app = Flask(__name__)
 
 
 
-def generate(team, data):
+def generate(teamList, data):
 
     prompt = """
             Given this data, 
-            Give me a 1000 word summary in markdown of the english premier league season from the point of view of """ + team + """  
+            Give me a 1000 word summary in html of the english premier league season from the point of view of """ + teamList + """  
             Note that the season is still in progress.  
             Do not name any managers or players, but mention specific teams that they played.  
             Emphasize derbies.  
             Summarize the start of the season, middle of the season, 
             and then give the latest progress as of April 2024, summarizing their last four games """ + data
+
+    print(prompt)
 
     generation_config = {
         "max_output_tokens": 8192,
@@ -58,11 +60,13 @@ def generate(team, data):
 @app.route("/summary", methods = ['GET'])
 def summaryEndpoint():
     # get the team name, country code, season, and league from the request
-    team = str(request.args.get('team'))
+    teamList = str(request.args.get('teamList'))
     countryCode = str(request.args.get('countryCode'))
     season = str(request.args.get('season'))
     leagueID = str(request.args.get('leagueID'))
        
+    # teamList is comma-delimited; split it into an array of teams
+    teams = teamList.split(",")
     
     # make a REST POST call to getSeason, passing the league and season
     url = "https://us-east1-evcon-app.cloudfunctions.net/getSeason?countryCode=" + countryCode + "&leagueID=" + leagueID + "&season=" + season
@@ -70,18 +74,18 @@ def summaryEndpoint():
 
     # get the response as a json object
     data = response.json()
-    teamData = None
+    teamData = ""
 
     # loop through the response.datasets until label = teamname
     for dataset in data['datasets']:
-        if dataset['label'] == team:
-            teamData = dataset
-            break
+        # if dataset.label is in the list of teams
+        if dataset['label'] in teams:
+            teamData += json.dumps(dataset)
 
     print (teamData)
 
     # generate a checksum of the response
-    dataHash = hashlib.sha256(json.dumps(teamData).encode()).hexdigest()
+    dataHash = hashlib.sha256(teamData.encode()).hexdigest()
 
     fileName = countryCode + "-" + leagueID + "-" + season + "-" + dataHash + ".txt"
     print (fileName)
@@ -105,7 +109,7 @@ def summaryEndpoint():
         print("file doesn't exist, generating...")
 
         # Generate the summary
-        summary = generate(team, json.dumps(teamData))
+        summary = generate(teamList, json.dumps(teamData))
 
         print("done generating, now uploading")
 
