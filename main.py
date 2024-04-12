@@ -66,11 +66,22 @@ def summaryEndpoint():
 
     # get the response as a json object
     data = response.json()
-    print (data)
+    teamData = None
+
+    # loop through the response.datasets until label = teamname
+    for dataset in data['datasets']:
+        if dataset['label'] == team:
+            teamData = dataset
+            break
+
+    print (teamData)
 
     # generate a checksum of the response
-    dataHash = hashlib.sha256(json.dumps(data).encode()).hexdigest()
-    print (dataHash)
+    dataHash = hashlib.sha256(json.dumps(teamData).encode()).hexdigest()
+
+    fileName = countryCode + "-" + leagueID + "-" + season + "-" + dataHash + ".txt"
+
+    print (fileName)
 
     # summary = generate()
     summary = 'go spurs!'
