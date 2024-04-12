@@ -102,11 +102,13 @@ def summaryEndpoint():
         summary = blob.download_as_text()
 
     else:
-        print("file doesn't exist, creating...")
+        print("file doesn't exist, generating...")
 
         # Generate the summary
-        summary = 'go spurs!'
+        summary = generate(team, json.dumps(teamData))
 
+        print("done generating, now uploading")
+        
         # Upload the summary to the GCS bucket
         blob.upload_from_string(summary)
 
