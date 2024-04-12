@@ -5,6 +5,7 @@ import vertexai.preview.generative_models as generative_models
 import os
 
 from flask import Flask,jsonify,request 
+import requests
 
 app = Flask(__name__)
 
@@ -50,7 +51,21 @@ def generate():
 
 @app.route("/summary", methods = ['GET'])
 def summaryEndpoint():
+    # get the team name, country code, season, and league from the request
+    team = str(request.args.get('team'))
+    countryCode = str(request.args.get('countryCode'))
+    season = str(request.args.get('season'))
+    leagueID = str(request.args.get('leagueID'))
+       
     
+    # make a REST POST call to getSeason, passing the league and season
+    url = "https://us-east1-evcon-app.cloudfunctions.net/getSeason?countryCode=" + countryCode + "&leagueID=" + leagueID + "&season=" + season
+    response = requests.post(url)
+
+    # get the response as a json object
+    data = response.json()
+    print (data)
+
     # summary = generate()
     summary = 'go spurs!'
 
