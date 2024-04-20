@@ -18,12 +18,11 @@ def generate(teamList, data):
 
     prompt = """
             Given this data, 
-            Give me a 1000 word summary in html of the english premier league season from the point of view of """ + teamList + """  
-            Note that the season is still in progress.  
+            Give me a 1000 word summary in html of the soccer season from the point of view of """ + teamList + """  
             Do not name any managers or players, but mention specific teams that they played.  
             Emphasize derbies.  
             Summarize the start of the season, middle of the season, 
-            and then give the latest progress as of April 2024, summarizing their last four games """ + data
+            and then give the latest progress, summarizing their last four games """ + data
 
     print(prompt)
 
