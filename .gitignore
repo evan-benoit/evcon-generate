@@ -19,3 +19,6 @@
 
 # Go workspace file
 go.work
+tf/.terraform.lock.hcl
+tf/terraform.tfstate
+tf/.terraform/providers/registry.terraform.io/hashicorp/google/4.65.2/darwin_arm64/terraform-provider-google_v4.65.2_x5
